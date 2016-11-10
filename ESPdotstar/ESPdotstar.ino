@@ -8,14 +8,18 @@
 Adafruit_DotStar strip = Adafruit_DotStar(NUMPIXELS, DATAPIN, CLOCKPIN);
 
 void setup() {
+  Serial.begin(115200);
+  Serial.println("print is working great...");
   strip.begin();
   strip.show();
+  delay(2000);
+  Serial.println("I mean really great");
 }
 int      head  = 0, tail = -10;
 uint32_t color = 0xFF0000;
 
 void loop() {
-
+  Serial.println("loop start");
   strip.setPixelColor(head, color);
   strip.setPixelColor(tail, 0);
   strip.show();

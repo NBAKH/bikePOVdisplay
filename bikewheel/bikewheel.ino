@@ -1,4 +1,6 @@
 /*------------------------------------------------------------------------
+  Making it ESP8266 friendly
+
   POV LED bike wheel sketch.  Uses the following Adafruit parts:
 
   - Pro Trinket 5V (www.adafruit.com/product/2000)
@@ -26,7 +28,7 @@
   See 'COPYING' file for additional notes.
   ------------------------------------------------------------------------*/
 
-#include <Arduino.h> //maybe that includes pgmspace
+//#include <Arduino.h> //maybe that includes pgmspace
 #include <Adafruit_DotStar.h>
 //#include <avr/power.h>
 //#include <avr/sleep.h>
@@ -70,7 +72,7 @@ typedef uint16_t line_t; // Bigger images OK on other boards
 #endif
 // Select from multiple images using tactile button (#1489) between pin and
 // ground.  Requires suitably-built pixels.h file w/more than one image.
-#define SELECT_PIN 3
+//#define SELECT_PIN 3
 
 // Optional feature -- not enabled here, no space -- a vibration switch
 // (aligned perpendicular to leash) is used as a poor man's accelerometer.
@@ -116,17 +118,23 @@ void     sleep(void);
 #endif
 
 void setup() {
+Serial.begin(115200);
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000L)
   clock_prescale_set(clock_div_1);   // Enable 16 MHz on Trinket
+  Serial.println("avr clock");
 #endif
 
 #ifdef POWER_PIN
   pinMode(POWER_PIN, OUTPUT);
   digitalWrite(POWER_PIN, LOW); // Power-on LED strip
+  Serial.println("power pin defined");
 #endif
+Serial.println("starting strip");
   strip.begin();                // Allocate DotStar buffer, init SPI
   strip.clear();                // Make sure strip is clear
   strip.show();                 // before measuring battery
+Serial.println("strip ready");
+
 
   // Display battery level bargraph on startup.  It's just a vague estimate
   // based on cell voltage (drops with discharge) but doesn't handle curve.
@@ -141,10 +149,13 @@ void setup() {
     strip.show();                                 // Animate a bit
     delay(250 / NUM_LEDS);
   }
-  delay(1500);                                    // Hold last state a moment
+  delay(1500);
+  Serial.println("clear strip");                                  // Hold last state a moment
   strip.clear();                                  // Then clear strip
+  Serial.println("show strip");
   strip.show();
 
+  Serial.println("image Initialize");
   imageInit(); // Initialize pointers for default image
 
 #ifdef SELECT_PIN
@@ -169,12 +180,15 @@ uint8_t  imageNumber   = 0,  // Current image being displayed
          palette[16][3];     // RAM-based color table for 1- or 4-bit images
 line_t   imageLines,         // Number of lines in active image
          imageLine;          // Current line number in image
+
 #ifdef SELECT_PIN
 uint8_t  debounce      = 0;  // Debounce counter for image select pin
 #endif
 
 void imageInit() { // Initialize global image state for current imageNumber
   imageType    = pgm_read_byte(&images[imageNumber].type);
+  Serial.print("imageType: ");
+  //Serial.println(imageType);
 #ifdef __AVR_ATtiny85__
   imageLines   = pgm_read_byte(&images[imageNumber].lines);
 #else
@@ -182,14 +196,24 @@ void imageInit() { // Initialize global image state for current imageNumber
 #endif
   imageLine    = 0;
   imagePalette = (uint8_t *)pgm_read_word(&images[imageNumber].palette);
+  Serial.print("imagePalette: ");
+  //Serial.println(imagePalette);
   imagePixels  = (uint8_t *)pgm_read_word(&images[imageNumber].pixels);
   // 1- and 4-bit images have their color palette loaded into RAM both for
   // faster access and to allow dynamic color changing.  Not done w/8-bit
   // because that would require inordinate RAM (328P could handle it, but
   // I'd rather keep the RAM free for other features in the future).
-  if(imageType == PALETTE1)      memcpy_P(palette, imagePalette,  2 * 3);
-  else if(imageType == PALETTE4) memcpy_P(palette, imagePalette, 16 * 3);
+  Serial.println("before memcpy_P");
+  if(imageType == PALETTE1){
+          memcpy_P(palette, imagePalette,  2 * 3);
+          Serial.println("memcpy_P PALETTE1, done");
+        }
+  else if(imageType == PALETTE4) {
+    memcpy_P(palette, imagePalette, 16 * 3);
+    Serial.println("memcpy_P PALETTE4, done");
+  }
   lastImageTime = millis(); // Save time of image init for next auto-cycle
+  Serial.println("imageInit");
 }
 
 void nextImage(void) {
@@ -238,7 +262,7 @@ void loop() {
   // you can comment out the corresponding blocks below.  e.g. PALETTE8 and
   // TRUECOLOR are somewhat impractical on Trinket, and commenting them out
   // can free up nearly 200 bytes of extra image storage.
-
+  Serial.println("Before switch case");
   switch(imageType) {
 
     case PALETTE1: { // 1-bit (2 color) palette-based image
@@ -256,6 +280,7 @@ void loop() {
     }
 
     case PALETTE4: { // 4-bit (16 color) palette-based image
+      Serial.println("PALETTE4");
       uint8_t  pixelNum, p1, p2,
               *ptr = (uint8_t *)&imagePixels[imageLine * NUM_LEDS / 2];
       for(pixelNum = 0; pixelNum < NUM_LEDS; ) {
