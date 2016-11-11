@@ -28,17 +28,17 @@
   See 'COPYING' file for additional notes.
   ------------------------------------------------------------------------*/
 
-//#include <Arduino.h> //maybe that includes pgmspace
+#include <Arduino.h> //maybe that includes pgmspace
 #include <Adafruit_DotStar.h>
 //#include <avr/power.h>
 //#include <avr/sleep.h>
 #include <SPI.h> // Enable this line on Pro Trinket
 
-#ifdef ESP8266
+// #ifdef ESP8266
   #include <pgmspace.h>
-#else
-  #include <avr/pgmspace.h>
-#endif
+// #else
+//   #include <avr/pgmspace.h>
+// #endif
 
 #ifdef __AVR_ATtiny85__
 typedef uint8_t  line_t; // Max 255 lines/image on Trinket
@@ -63,13 +63,14 @@ typedef uint16_t line_t; // Bigger images OK on other boards
 // Ideally you use hardware SPI as it's much faster, though limited to
 // specific pins.  If you really need to bitbang DotStar data & clock on
 // different pins, optionally define those here:
-#ifdef ESP8266
+// #ifdef ESP8266
   #define LED_DATA_PIN  MOSI //changed to fit ESP8266 modules. look in ESPdotstar
   #define LED_CLOCK_PIN SCK // same
-#else
-  #define LED_DATA_PIN 11
-  #define LED_CLOCK_PIN 12
-#endif
+
+// #else
+//   #define LED_DATA_PIN 11
+//   #define LED_CLOCK_PIN 12
+// #endif
 // Select from multiple images using tactile button (#1489) between pin and
 // ground.  Requires suitably-built pixels.h file w/more than one image.
 //#define SELECT_PIN 3
@@ -133,7 +134,15 @@ Serial.println("starting strip");
   strip.begin();                // Allocate DotStar buffer, init SPI
   strip.clear();                // Make sure strip is clear
   strip.show();                 // before measuring battery
-Serial.println("strip ready");
+  Serial.println("strip ready");
+
+  int      head  = 0, tail = -10;
+  uint32_t color = 0xFF0000;
+
+
+
+
+
 
 
   // Display battery level bargraph on startup.  It's just a vague estimate
@@ -165,6 +174,7 @@ Serial.println("strip ready");
   pinMode(MOTION_PIN, INPUT_PULLUP);
   sleep();     // Sleep until motion detected
 #endif
+
 }
 
 // GLOBAL STATE STUFF ------------------------------------------------------
@@ -205,11 +215,11 @@ void imageInit() { // Initialize global image state for current imageNumber
   // I'd rather keep the RAM free for other features in the future).
   Serial.println("before memcpy_P");
   if(imageType == PALETTE1){
-          memcpy_P(palette, imagePalette,  2 * 3);
-          Serial.println("memcpy_P PALETTE1, done");
-        }
+       memcpy_P(palette, imagePalette,  2 * 3);
+      Serial.println("memcpy_P PALETTE1, done");
+    }
   else if(imageType == PALETTE4) {
-    memcpy_P(palette, imagePalette, 16 * 3);
+     memcpy_P(palette, imagePalette, 16 * 3);
     Serial.println("memcpy_P PALETTE4, done");
   }
   lastImageTime = millis(); // Save time of image init for next auto-cycle
