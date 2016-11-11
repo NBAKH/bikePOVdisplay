@@ -131,7 +131,7 @@ void loop() {
   switch(imageType) {
     case PALETTE4: { // 4-bit (16 color) palette-based image
       uint8_t  pixelNum, p1, p2,
-              *ptr = (uint8_t *)&imagePixels[imageLine * NUM_LEDS / 2];
+              ptr = imagePixels[imageLine * NUM_LEDS / 2];
       for(pixelNum = 0; pixelNum < NUM_LEDS; ) {
         p2  = ptr++; // Data for two pixels...
         p1  = p2 >> 4;              // Shift down 4 bits for first pixel
