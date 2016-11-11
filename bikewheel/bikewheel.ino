@@ -68,38 +68,6 @@ typedef uint16_t line_t; // Bigger images OK on other boards
   #define LED_DATA_PIN 11
   #define LED_CLOCK_PIN 12
 #endif
-// Select from multiple images using tactile button (#1489) between pin and
-// ground.  Requires suitably-built pixels.h file w/more than one image.
-#define SELECT_PIN 3
-
-// Optional feature -- not enabled here, no space -- a vibration switch
-// (aligned perpendicular to leash) is used as a poor man's accelerometer.
-// Poi then lights only when moving, saving some power.  The 'fast'
-// vibration switch is VERY sensitive and will trigger at the slightest
-// bump, while the 'medium' switch requires a certain spin rate which may
-// not trigger if you're doing mellow spins.  Neither is perfect.  To leave
-// that out and simply have the poi run always-on, comment out this line:
-//#define MOTION_PIN 2
-
-// Another optional feature not enable due to physical size -- powering down
-// DotStars when idle conserves more battery.  Use a PNP transistor (e.g.
-// 2N2907) (w/220 Ohm resistor to base) as a 'high side' switch to DotStar
-// +V.  DON'T do this NPN/low-side, may damage strip.  MOTION_PIN must also
-// be defined to use this (pointless without).
-//#define POWER_PIN 4
-
-#define SLEEP_TIME 2000   // Not-spinning time before sleep, in milliseconds
-
-// Empty and full thresholds (millivolts) used for battery level display:
-#define BATT_MIN_MV 3350  // Some headroom over battery cutoff near 2.9V
-#define BATT_MAX_MV 4000  // And little below fresh-charged battery near 4.1V
-// These figures are based on LiPoly cell and will need to be tweaked for
-// 3X NiMH or alkaline batteries!
-
-boolean autoCycle = true; // Set to true to cycle images by default
-#define CYCLE_TIME 10     // Time, in seconds, between auto-cycle images
-
-// -------------------------------------------------------------------------
 
 #if defined(LED_DATA_PIN) && defined(LED_CLOCK_PIN)
 // Older DotStar LEDs use GBR order.  If colors are wrong, edit here.
