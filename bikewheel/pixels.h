@@ -10,7 +10,7 @@
 
 // pride.gif ---------------------------------------------------------------
 
-const uint8_t PROGMEM palette00[][3] = {
+const uint8_t palette00[][3] = {
   {  34,   0,  75 },
   {  75,  75,   0 },
   {   0,  50,   0 },
@@ -19,7 +19,7 @@ const uint8_t PROGMEM palette00[][3] = {
   {  75,  18,   0 },
   {   0,   6,  75 } };
 
-const uint8_t PROGMEM pixels00[] = {
+const uint8_t pixels00[] = {
   0X34, 0X44, 0X44, 0X44, 0X44, 0X44, 0X44, 0X43,
   0X33, 0X44, 0X44, 0X44, 0X44, 0X44, 0X44, 0X33,
   0X53, 0X34, 0X44, 0X44, 0X44, 0X44, 0X43, 0X35,
@@ -82,7 +82,7 @@ typedef struct {
   const uint8_t *pixels;  // -> Pixel data in PROGMEM
 } image;
 
-const image PROGMEM images[] = {
+const image images[] = {
   { PALETTE4 ,   54, (const uint8_t *)palette00, pixels00 }
 };
 
