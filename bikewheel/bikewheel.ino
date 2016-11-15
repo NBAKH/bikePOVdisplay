@@ -77,7 +77,8 @@ void setup() {
   strip.begin();                // Allocate DotStar buffer, init SPI
   strip.clear();                // Make sure strip is clear
   strip.show();                 // before measuring battery
-
+  Serial.begin(115200);
+  Serial.println("imageinit");
   imageInit(); // Initialize pointers for default image
 }
 
@@ -97,17 +98,26 @@ uint8_t  debounce      = 0;  // Debounce counter for image select pin
 
 void imageInit() { // Initialize global image state for current imageNumber
   imageType    = images[imageNumber].type;
+  Serial.println(imageType);
   imageLines   = images[imageNumber].lines;
-
+  Serial.println(imageLines);
   imageLine    = 0;
   imagePalette = (uint8_t *)(&images[imageNumber].palette);
+
   imagePixels  = (uint8_t *)(&images[imageNumber].pixels);
+
   // 1- and 4-bit images have their color palette loaded into RAM both for
   // faster access and to allow dynamic color changing.  Not done w/8-bit
   // because that would require inordinate RAM (328P could handle it, but
   // I'd rather keep the RAM free for other features in the future).
-  if(imageType == PALETTE1)      (palette, imagePalette,  2 * 3);
-  else if(imageType == PALETTE4) (palette, imagePalette, 16 * 3);
+  if(imageType == PALETTE1)     {
+  (palette, imagePalette,  2 * 3);
+  Serial.println(PALETTE1);
+  }
+  else if(imageType == PALETTE4) {
+    (palette, imagePalette, 16 * 3);
+    Serial.println(PALETTE4);
+  }
   lastImageTime = millis(); // Save time of image init for next auto-cycle
 }
 
@@ -127,27 +137,35 @@ void loop() {
   // you can comment out the corresponding blocks below.  e.g. PALETTE8 and
   // TRUECOLOR are somewhat impractical on Trinket, and commenting them out
   // can free up nearly 200 bytes of extra image storage.
-
+  Serial.print("image type is: ");
+  Serial.println(imageType);
   switch(imageType) {
-    case PALETTE4: { // 4-bit (16 color) palette-based image
+    case 1: { // 4-bit (16 color) palette-based image
+      // Serial.println("case 1");
       uint8_t  pixelNum, p1, p2,
               ptr = imagePixels[imageLine * NUM_LEDS / 2];
+              Serial.println(ptr);
       for(pixelNum = 0; pixelNum < NUM_LEDS; ) {
         p2  = ptr++; // Data for two pixels...
+        // Serial.print("p2: ");
+        // Serial.println(p2);
         p1  = p2 >> 4;              // Shift down 4 bits for first pixel
+        // Serial.print("p1: ");
+        // Serial.println(p1);
         p2 &= 0x0F;                 // Mask out low 4 bits for second pixel
         strip.setPixelColor(pixelNum++,
           palette[p1][0], palette[p1][1], palette[p1][2]);
+
         strip.setPixelColor(pixelNum++,
           palette[p2][0], palette[p2][1], palette[p2][2]);
       }
       break;
     }
-  }
 
   strip.show(); // Refresh LEDs
 #if !defined(LED_DATA_PIN) && !defined(LED_CLOCK_PIN)
   delayMicroseconds(900);  // Because hardware SPI is ludicrously fast
 #endif
   if(++imageLine >= imageLines) imageLine = 0; // Next scanline, wrap around
+}
 }
