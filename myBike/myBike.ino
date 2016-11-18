@@ -16,7 +16,7 @@
 // #define MY_TYPE int
 // typedef int My_Type;
 
-Adafruit_DotStar strip = Adafruit_DotStar(NUM_LEDS, DATAPIN, CLOCKPIN);
+Adafruit_DotStar strip = Adafruit_DotStar(NUM_LEDS+1, DATAPIN, CLOCKPIN);
 
 //global shit i've stolen
 uint8_t  imageType,          // Image type: PALETTE[1,4,8] or TRUECOLOR
@@ -63,10 +63,10 @@ void loop() {
         p2 &= 0x0F;
         //Serial.println(pixelNum+(imageLine*NUM_LEDS/2));
 
-        strip.setPixelColor(pixelNum++,
+        strip.setPixelColor(1+pixelNum++,
           palette00[p1][0],palette00[p1][1],palette00[p1][2]);
 
-        strip.setPixelColor(pixelNum++,
+        strip.setPixelColor(1+pixelNum++,
           palette00[p2][0],palette00[p2][1],palette00[p2][2]);
       }
       imageLine++;
