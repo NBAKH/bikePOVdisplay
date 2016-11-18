@@ -29,8 +29,8 @@ void initializePhoto(){
   imageType    = paletteType;
   if(paletteType == 1){
     imageLines   = sizeof(pixels00)*2/NUM_LEDS;
-    Serial.print("Image lines: ");
-    Serial.println(imageLines);
+    // Serial.print("Image lines: ");
+    // Serial.println(imageLines);
   }
 
   imageLine   = 0;
@@ -44,7 +44,7 @@ void initializePhoto(){
 }
 
 void setup() {
-  Serial.begin(115200);
+  //Serial.begin(115200);
   strip.begin();
   strip.show();
   initializePhoto();
@@ -52,6 +52,8 @@ void setup() {
 
 void loop() {
   switch (imageType) {
+    case 0:
+    break;
     case 1:
       uint8_t p1, p2, pixelNum;//*ptr = (uint8_t*)&pixels00[];
       for(pixelNum = 0; pixelNum<NUM_LEDS;){
@@ -59,7 +61,7 @@ void loop() {
         p2  = pixels00[pixelNum%16+(imageLine*NUM_LEDS/2)];
         p1 = p2 >> 4;
         p2 &= 0x0F;
-        Serial.println(pixelNum+(imageLine*NUM_LEDS/2));
+        //Serial.println(pixelNum+(imageLine*NUM_LEDS/2));
 
         strip.setPixelColor(pixelNum++,
           palette00[p1][0],palette00[p1][1],palette00[p1][2]);
@@ -68,9 +70,13 @@ void loop() {
           palette00[p2][0],palette00[p2][1],palette00[p2][2]);
       }
       imageLine++;
-      if(imageLine>imageLines) imageLine=0;
+      if(imageLine>=imageLines) imageLine=0;
       strip.show();
     break;
+    case 2:
+    break;
+    case 3:
+    break;
   }
-  // delay(500);
+  delay(500);
 }
