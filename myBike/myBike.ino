@@ -103,5 +103,5 @@ void loop() {
     case 3:
     break;
   }
-  delay(500);
+  //delay(500);
 }
