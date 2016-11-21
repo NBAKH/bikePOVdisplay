@@ -277,9 +277,10 @@ for imgNum, image in enumerate(images): # For each image in list...
 						writeByte(0)
 
 	else:
+		sys.stdout.write("const uint8_t  palette00[][3] = {};")
 		# Perform gamma- and brightness-adjustment on pixel data
 		sys.stdout.write(
-		  "const uint8_t PROGMEM pixels%02d[] = {" % imgNum)
+		  "const uint8_t pixels%02d[] = {" % imgNum)
 		numBytes = image.size[0] * numLEDs * 3
 
 		for x in range(image.size[0]):
@@ -300,6 +301,7 @@ for imgNum, image in enumerate(images): # For each image in list...
 					writeByte(0)
 
 	print " };" # end pixels[] array
+
 	print
 
 # Last pass, print table of images...

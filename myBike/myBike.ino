@@ -1,4 +1,4 @@
-#include "test.h"
+#include "blimp.h"
 
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
@@ -37,6 +37,8 @@ void initializePhoto(){
     case 2:
       imageLines = sizeof(pixels00)/NUM_LEDS;
     break;
+    case 3:
+      imageLines = sizeof(pixels00)/NUM_LEDS/3;
     Serial.print("Image lines: ");
     Serial.println(imageLines);
 
@@ -90,7 +92,6 @@ void loop() {
       uint16_t o;
       for(int pixelNum = 0; pixelNum<NUM_LEDS;){
         o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
-        Serial.println(o);
         strip.setPixelColor(1+pixelNum++,
           palette00[o][0],palette00[o][1],palette00[o][2]);
         //pixelNum++;
@@ -101,6 +102,19 @@ void loop() {
       strip.show();
     break;
     case 3:
+      uint8_t p, r, g, b;
+      p = 0;
+      for(int pixelNum = 0; pixelNum<NUM_LEDS*3;){
+
+        r = pixels00[pixelNum++];
+        g = pixels00[pixelNum++];
+        b = pixels00[pixelNum++];
+        strip.setPixelColor(p,r,g,b);
+        p++;
+        if(p>imageLines){
+          p==0;
+        }
+      }
     break;
   }
   //delay(500);
