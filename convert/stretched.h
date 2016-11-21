@@ -1,14 +1,16 @@
 // Don't edit this file!  It's software-generated.
 // See convert.py script instead.
 
-
+#define PALETTE1  0
+#define PALETTE4  1
+#define PALETTE8  2
+#define TRUECOLOR 3
 
 #define NUM_LEDS 32
-#define paletteType PALETTE8
 
-// rgbwt.png ---------------------------------------------------------------
+// rgbwtStrech.png ---------------------------------------------------------
 
-const uint8_t palette00[][3] = {
+const uint8_t PROGMEM palette00[][3] = {
   {  32,   0,   0 },
   {   0,  17,  17 },
   {  30,  32,  31 },
@@ -53,9 +55,9 @@ const uint8_t palette00[][3] = {
   {  27,  22,  33 },
   {   4,   2,  33 },
   {   0,  12,   2 },
-  {   7,  27,  22 }  };
+  {   7,  27,  22 } };
 
-const uint8_t pixels00[] = {
+const uint8_t PROGMEM pixels00[] = {
   0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
   0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
   0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00, 0X00,
@@ -341,16 +343,15 @@ const uint8_t pixels00[] = {
   0X01, 0X01, 0X01, 0X01, 0X01, 0X01, 0X01, 0X01,
   0X01, 0X01, 0X01, 0X01, 0X01, 0X01, 0X01, 0X01 };
 
+typedef struct {
+  uint8_t        type;    // PALETTE[1,4,8] or TRUECOLOR
+  line_t         lines;   // Length of image (in scanlines)
+  const uint8_t *palette; // -> PROGMEM color table (NULL if truecolor)
+  const uint8_t *pixels;  // -> Pixel data in PROGMEM
+} image;
 
-// typedef struct {
-//   const uint8_t type;    // PALETTE[1,4,8] or TRUECOLOR
-//   const uint8_t lines;   // Length of image (in scanlines)
-//   const uint8_t palette; // -> PROGMEM color table (NULL if truecolor)
-//   const uint8_t pixels;  // -> Pixel data in PROGMEM
-// } image;
-//
-// const image images[] = {
-//   { PALETTE4 ,  5, palette00, pixels00 }
-// };
+const image PROGMEM images[] = {
+  { PALETTE8 ,   71, (const uint8_t *)palette00, pixels00 }
+};
 
-//#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))
+#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))

@@ -1,4 +1,4 @@
-#include "rgbwt.h"
+#include "test.h"
 
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
@@ -6,10 +6,10 @@
 #define DATAPIN MOSI
 #define CLOCKPIN SCK
 
-#define PALETTE1  0
-#define PALETTE4  1
-#define PALETTE8  2
-#define TRUECOLOR 3
+// #define PALETTE1  0
+// #define PALETTE4  1
+// #define PALETTE8  2
+// #define TRUECOLOR 3
 
 //typedef uint16_t line_t; //Is in the config file
 
@@ -26,12 +26,22 @@ uint8_t  imageType,          // Image type: PALETTE[1,4,8] or TRUECOLOR
          imageLine;          // Current line number in image
 
 void initializePhoto(){
-  imageType    = paletteType;
-  if(paletteType == 1){
-    imageLines   = sizeof(pixels00)*2/NUM_LEDS;
-    // Serial.print("Image lines: ");
-    // Serial.println(imageLines);
+  imageType = paletteType;
+  switch (imageType) {
+    case 0:
+      imageLines = sizeof(pixels00)*8/NUM_LEDS;
+    break;
+    case 1:
+      imageLines = sizeof(pixels00)*2/NUM_LEDS;
+    break;
+    case 2:
+      imageLines = sizeof(pixels00)/NUM_LEDS;
+    break;
+    Serial.print("Image lines: ");
+    Serial.println(imageLines);
+
   }
+
 
   imageLine   = 0;
   // imagePalette = palette00[0];
@@ -44,8 +54,10 @@ void initializePhoto(){
 }
 
 void setup() {
-  //Serial.begin(115200);
+  Serial.begin(115200);
+  Serial.println("Begin strip");
   strip.begin();
+  Serial.println("Begin show");
   strip.show();
   initializePhoto();
 }
@@ -53,6 +65,7 @@ void setup() {
 void loop() {
   switch (imageType) {
     case 0:
+
     break;
     case 1:
       uint8_t p1, p2, pixelNum;//*ptr = (uint8_t*)&pixels00[];
@@ -74,6 +87,18 @@ void loop() {
       strip.show();
     break;
     case 2:
+      uint16_t o;
+      for(int pixelNum = 0; pixelNum<NUM_LEDS;){
+        o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
+        Serial.println(o);
+        strip.setPixelColor(1+pixelNum++,
+          palette00[o][0],palette00[o][1],palette00[o][2]);
+        //pixelNum++;
+
+      }
+      imageLine++;
+      if(imageLine>=imageLines) imageLine=0;
+      strip.show();
     break;
     case 3:
     break;
