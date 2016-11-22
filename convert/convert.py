@@ -215,7 +215,7 @@ for imgNum, image in enumerate(images): # For each image in list...
 
 	if image.numColors <= 256:
 		# Output gamma- and brightness-adjusted color palette:
-		print ("const uint8_t PROGMEM palette%02d[][3] = {" % imgNum)
+		print ("const uint8_t palette%02d[][3] = {" % imgNum)
 		for i in range(image.numColors):
 			sys.stdout.write("  { %3d, %3d, %3d }" % (
 			  int(pow((lut[i][0]/255.0),gamma)*bR1+0.5),
@@ -226,7 +226,7 @@ for imgNum, image in enumerate(images): # For each image in list...
 		print
 
 		sys.stdout.write(
-		  "const uint8_t PROGMEM pixels%02d[] = {" % imgNum)
+		  "const uint8_t pixels%02d[] = {" % imgNum)
 
 		if image.numColors <= 2:
 			numBytes = image.size[0] * numLEDs / 8
@@ -277,9 +277,10 @@ for imgNum, image in enumerate(images): # For each image in list...
 						writeByte(0)
 
 	else:
+		sys.stdout.write("const uint8_t  palette00[][3] = {};")
 		# Perform gamma- and brightness-adjustment on pixel data
 		sys.stdout.write(
-		  "const uint8_t PROGMEM pixels%02d[] = {" % imgNum)
+		  "const uint8_t pixels%02d[] = {" % imgNum)
 		numBytes = image.size[0] * numLEDs * 3
 
 		for x in range(image.size[0]):
@@ -300,44 +301,45 @@ for imgNum, image in enumerate(images): # For each image in list...
 					writeByte(0)
 
 	print " };" # end pixels[] array
+
 	print
 
 # Last pass, print table of images...
 
-print "typedef struct {"
-print "  uint8_t        type;    // PALETTE[1,4,8] or TRUECOLOR"
-print "  line_t         lines;   // Length of image (in scanlines)"
-print "  const uint8_t *palette; // -> PROGMEM color table (NULL if truecolor)"
-print "  const uint8_t *pixels;  // -> Pixel data in PROGMEM"
-print "} image;"
-print
-print "const image PROGMEM images[] = {"
+# print "typedef struct {"
+# print "  uint8_t        type;    // PALETTE[1,4,8] or TRUECOLOR"
+# print "  line_t         lines;   // Length of image (in scanlines)"
+# print "  const uint8_t *palette; // -> PROGMEM color table (NULL if truecolor)"
+# print "  const uint8_t *pixels;  // -> Pixel data in PROGMEM"
+# print "} image;"
+# print
+# print "const image images[] = {"
 
 for imgNum, image in enumerate(images): # For each image in list...
-	sys.stdout.write("  { ")
+	sys.stdout.write("#define paletteType ")
 	if image.numColors <= 2:
-		sys.stdout.write("PALETTE1 , ")
+		sys.stdout.write("PALETTE1")
 	elif image.numColors <= 16:
-		sys.stdout.write("PALETTE4 , ")
+		sys.stdout.write("PALETTE4")
 	elif image.numColors <= 256:
-		sys.stdout.write("PALETTE8 , ")
+		sys.stdout.write("PALETTE8")
 	else:
-		sys.stdout.write("TRUECOLOR, ")
+		sys.stdout.write("TRUECOLOR ")
 
-	sys.stdout.write(" %3d, " % image.size[0])
+# 	sys.stdout.write(" %3d, " % image.size[0])
 
-	if image.numColors <= 256:
-		sys.stdout.write("(const uint8_t *)palette%02d, " % imgNum)
-	else:
-		sys.stdout.write("NULL                      , ")
+# 	if image.numColors <= 256:
+# 		sys.stdout.write("(const uint8_t *)palette%02d, " % imgNum)
+# 	else:
+# 		sys.stdout.write("NULL                      , ")
 
-	sys.stdout.write("pixels%02d }" % imgNum)
+# 	sys.stdout.write("pixels%02d }" % imgNum)
 
-	if imgNum < len(images) - 1:
-		print(",")
-	else:
-		print
+# 	if imgNum < len(images) - 1:
+# 		print(",")
+# 	else:
+# 		print
 
-print "};"
-print
-print "#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))"
+# print "};"
+# print
+# print "#define NUM_IMAGES (sizeof(images) / sizeof(images[0]))"

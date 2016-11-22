@@ -4,6 +4,11 @@
 
 
 #define NUM_LEDS 32
+#define PALETTE1  0
+#define PALETTE4  1
+#define PALETTE8  2
+#define TRUECOLOR 3
+
 #define paletteType PALETTE8
 
 // rgbwt.png ---------------------------------------------------------------
