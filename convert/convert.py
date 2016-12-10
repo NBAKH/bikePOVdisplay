@@ -152,7 +152,8 @@ print
 # Second pass estimates current of each column, then peak & overall average
 
 for imgNum, image in enumerate(images): # For each image in list...
-	sys.stdout.write("// %s%s\n\n" % (image.name,
+	#sys.stdout.write("// %s%s\n\n" % (image.name,
+	sys.stdout.write("// %s%s" % (image.name,
 	  ' '.ljust(73 - len(image.name),'-')))
 	if image.numColors <= 256:
 		# Palette optimization requires some weird shenanigans...
