@@ -1,6 +1,6 @@
 //interupt test on wemos, getting nodemcu's tomorrow
 
-const int pin = D3;
+const int pin = D2;
 
 void toggle() {
   static int state = 0;
@@ -19,5 +19,5 @@ void setup() {
 }
 
 void loop() {
-
+delay(10000);
 }

@@ -25,6 +25,11 @@ uint8_t  imageType,          // Image type: PALETTE[1,4,8] or TRUECOLOR
          imageLines,         // Number of lines in active image2
          imageLine;          // Current line number in image
 
+const int interruptPin = D2;
+unsigned long time1;
+unsigned long thisTime;
+unsigned long result;
+
 void initializePhoto(){
   imageType = paletteType;
   switch (imageType) {
@@ -55,16 +60,9 @@ void initializePhoto(){
   // lastImageTime = millis(); // Save time of image init for next auto-cycle
 }
 
-void setup() {
-  Serial.begin(115200);
-  Serial.println("Begin strip");
-  strip.begin();
-  Serial.println("Begin show");
-  strip.show();
-  initializePhoto();
-}
-
-void loop() {
+void animation(){
+  Serial.println("start animation loop");
+  detachInterrupt(interruptPin);
   switch (imageType) {
     case 0:
 
@@ -90,16 +88,19 @@ void loop() {
     break;
     case 2:
       uint16_t o;
-      for(int pixelNum = 0; pixelNum<NUM_LEDS;){
-        o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
-        strip.setPixelColor(1+pixelNum++,
-          palette00[o][0],palette00[o][1],palette00[o][2]);
-        //pixelNum++;
-
-      }
+      while(imageLine<=imageLines){
+        for(int pixelNum = 0; pixelNum<NUM_LEDS;){
+          o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
+          strip.setPixelColor(1+pixelNum++,
+            palette00[o][0],palette00[o][1],palette00[o][2]);
+          //pixelNum++;
+        }
       imageLine++;
-      if(imageLine>=imageLines) imageLine=0;
       strip.show();
+    }
+    imageLine=0;
+    timeCalc();
+    strip.clear();
     break;
     case 3:
       uint8_t p, r, g, b;
@@ -117,5 +118,30 @@ void loop() {
       }
     break;
   }
+  attachInterrupt(interruptPin, animation, CHANGE);
+}
+
+void timeCalc(){
+  time1=micros();
+  result = time1-thisTime;
+  Serial.print("one cycle: ");
+  Serial.println(result);
+  thisTime= time1;
+}
+
+void setup() {
+  Serial.begin(115200);
+  Serial.println("Begin strip");
+  strip.begin();
+  Serial.println("Begin show");
+  strip.show();
+  initializePhoto();
+  time1 = micros();
+  thisTime = time1;
+  pinMode(interruptPin, INPUT);
+  attachInterrupt(interruptPin, animation, CHANGE);
+}
+
+void loop() {
   //delay(500);
 }
