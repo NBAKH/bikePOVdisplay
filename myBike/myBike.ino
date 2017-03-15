@@ -2,6 +2,10 @@
 
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
+#include <Ticker.h>
+
+Ticker draw;
+
 /*extern "C" {
 #include "user_interface.h"
   uint16 readvdd33(void);
@@ -10,16 +14,6 @@
 }*/
 #define DATAPIN MOSI
 #define CLOCKPIN SCK
-
-// #define PALETTE1  0
-// #define PALETTE4  1
-// #define PALETTE8  2
-// #define TRUECOLOR 3
-
-//typedef uint16_t line_t; //Is in the config file
-
-// #define MY_TYPE int
-// typedef int My_Type;
 
 Adafruit_DotStar strip = Adafruit_DotStar(NUM_LEDS+1, DATAPIN, CLOCKPIN);
 
@@ -37,7 +31,6 @@ unsigned long wheelTime;
 unsigned long animationResult;
 unsigned long wheelResult;
 unsigned long delayTime;
-unsigned long nextLine;
 
 void initializePhoto(){
   imageType = paletteType;
@@ -69,9 +62,7 @@ void initializePhoto(){
   // lastImageTime = millis(); // Save time of image init for next auto-cycle
 }
 
-void animation(){
-  //detachInterrupt(interruptPin);
-  Serial.println("start animation loop");
+void tickerTime(){
   time1 = micros();
   if(animationResult+10000<time1 - wheelTime){
     wheelResult = time1 - wheelTime;
@@ -82,6 +73,13 @@ void animation(){
     Serial.print("----- delay time: ");
     Serial.println(delayTime);
   }
+  unsigned long timer = delayTime/1000;
+  draw.attach_ms(timer, animation);
+}
+
+void animation(){
+  //detachInterrupt(interruptPin);
+  Serial.println("start animation loop");
   //attachInterrupt(interruptPin, animation, FALLING);
   switch (imageType) {
     case 0:
@@ -108,25 +106,16 @@ void animation(){
     break;
     case 2:
       uint16_t o;
-      animationTime=micros();
-      nextLine = micros();
-      while(imageLine<=imageLines){
-        for(int pixelNum = 0; pixelNum<NUM_LEDS;){
-          o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
-          strip.setPixelColor(1+pixelNum++,
-            palette00[o][0],palette00[o][1],palette00[o][2]);
-          //pixelNum++;
-        }
-        //if(nextLine+delayTime<micros()){
-            imageLine++;
-      //      nextLine=micros();
-      //  }
-
-        strip.show();
-        //delayMicroseconds(delayTime);
+      for(int pixelNum = 0; pixelNum<NUM_LEDS;){
+        o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
+        strip.setPixelColor(1+pixelNum++,
+        palette00[o][0],palette00[o][1],palette00[o][2]);
       }
-      imageLine=0;
-      strip.clear();
+      imageLine++;
+      strip.show();
+      if(imageLine>=imageLines){
+        imageLine=0;
+      }
     break;
     case 3:
       uint8_t p, r, g, b;
@@ -221,8 +210,9 @@ void setup() {
   animationTime = time1;
   wheelTime = time1;
   pinMode(interruptPin, INPUT);
-  attachInterrupt(interruptPin, animation, FALLING);
+  attachInterrupt(interruptPin, tickerTime, FALLING);
   timeCalc();
+  draw.attach_ms(1000, animation);
 }
 
 void loop() {
