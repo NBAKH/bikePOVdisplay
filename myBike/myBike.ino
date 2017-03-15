@@ -2,7 +2,12 @@
 
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
-
+/*extern "C" {
+#include "user_interface.h"
+  uint16 readvdd33(void);
+  bool wifi_set_sleep_type(sleep_type_t);
+  sleep_type_t wifi_get_sleep_type(void);
+}*/
 #define DATAPIN MOSI
 #define CLOCKPIN SCK
 
@@ -27,8 +32,12 @@ uint8_t  imageType,          // Image type: PALETTE[1,4,8] or TRUECOLOR
 
 const int interruptPin = D2;
 unsigned long time1;
-unsigned long thisTime;
-unsigned long result;
+unsigned long animationTime;
+unsigned long wheelTime;
+unsigned long animationResult;
+unsigned long wheelResult;
+unsigned long delayTime;
+unsigned long nextLine;
 
 void initializePhoto(){
   imageType = paletteType;
@@ -61,8 +70,19 @@ void initializePhoto(){
 }
 
 void animation(){
+  //detachInterrupt(interruptPin);
   Serial.println("start animation loop");
-  detachInterrupt(interruptPin);
+  time1 = micros();
+  if(animationResult+10000<time1 - wheelTime){
+    wheelResult = time1 - wheelTime;
+    wheelTime = time1;
+    Serial.print("Wheel time: ");
+    Serial.println(wheelResult);
+    delayTime = (wheelResult-animationResult)/imageLines;
+    Serial.print("----- delay time: ");
+    Serial.println(delayTime);
+  }
+  //attachInterrupt(interruptPin, animation, FALLING);
   switch (imageType) {
     case 0:
 
@@ -88,6 +108,8 @@ void animation(){
     break;
     case 2:
       uint16_t o;
+      animationTime=micros();
+      nextLine = micros();
       while(imageLine<=imageLines){
         for(int pixelNum = 0; pixelNum<NUM_LEDS;){
           o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
@@ -95,12 +117,16 @@ void animation(){
             palette00[o][0],palette00[o][1],palette00[o][2]);
           //pixelNum++;
         }
-      imageLine++;
-      strip.show();
-    }
-    imageLine=0;
-    timeCalc();
-    strip.clear();
+        //if(nextLine+delayTime<micros()){
+            imageLine++;
+      //      nextLine=micros();
+      //  }
+
+        strip.show();
+        //delayMicroseconds(delayTime);
+      }
+      imageLine=0;
+      strip.clear();
     break;
     case 3:
       uint8_t p, r, g, b;
@@ -118,18 +144,73 @@ void animation(){
       }
     break;
   }
-  attachInterrupt(interruptPin, animation, CHANGE);
 }
 
 void timeCalc(){
+  animationTime=micros();
+  while(imageLine<=imageLines){
+    switch (imageType) {
+      case 0:
+
+      break;
+      case 1:
+        uint8_t p1, p2, pixelNum;//*ptr = (uint8_t*)&pixels00[];
+        for(pixelNum = 0; pixelNum<NUM_LEDS;){
+
+          p2  = pixels00[pixelNum%16+(imageLine*NUM_LEDS/2)];
+          p1 = p2 >> 4;
+          p2 &= 0x0F;
+          //Serial.println(pixelNum+(imageLine*NUM_LEDS/2));
+
+          strip.setPixelColor(1+pixelNum++,
+            palette00[p1][0],palette00[p1][1],palette00[p1][2]);
+
+          strip.setPixelColor(1+pixelNum++,
+            palette00[p2][0],palette00[p2][1],palette00[p2][2]);
+        }
+        imageLine++;
+        if(imageLine>=imageLines) imageLine=0;
+        strip.show();
+      break;
+      case 2:
+        uint16_t o;
+          for(int pixelNum = 0; pixelNum<NUM_LEDS;){
+            o = pixels00[pixelNum+(imageLine*NUM_LEDS)];
+            strip.setPixelColor(1+pixelNum++,
+              palette00[o][0],palette00[o][1],palette00[o][2]);
+            //pixelNum++;
+          }
+        imageLine++;
+        strip.show();
+      break;
+      case 3:
+        uint8_t p, r, g, b;
+        p = 0;
+        for(int pixelNum = 0; pixelNum<NUM_LEDS*3;){
+
+          r = pixels00[pixelNum++];
+          g = pixels00[pixelNum++];
+          b = pixels00[pixelNum++];
+          strip.setPixelColor(p,r,g,b);
+          p++;
+          if(p>imageLines){
+            p==0;
+          }
+        }
+      break;
+    }
+  }
+  imageLine=0;
+  strip.clear();
   time1=micros();
-  result = time1-thisTime;
+  animationResult = time1-animationTime;
   Serial.print("one cycle: ");
-  Serial.println(result);
-  thisTime= time1;
+  Serial.println(animationResult);
+  animationTime= time1;
 }
 
 void setup() {
+  //wifi_set_sleep_type(MODEM_SLEEP_T);
   Serial.begin(115200);
   Serial.println("Begin strip");
   strip.begin();
@@ -137,9 +218,11 @@ void setup() {
   strip.show();
   initializePhoto();
   time1 = micros();
-  thisTime = time1;
+  animationTime = time1;
+  wheelTime = time1;
   pinMode(interruptPin, INPUT);
-  attachInterrupt(interruptPin, animation, CHANGE);
+  attachInterrupt(interruptPin, animation, FALLING);
+  timeCalc();
 }
 
 void loop() {
