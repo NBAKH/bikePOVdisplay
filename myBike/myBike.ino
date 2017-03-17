@@ -1,5 +1,5 @@
 //works great
-#include "lab.h"
+#include "nasty.h"
 
 #include <Adafruit_DotStar.h>
 #include <SPI.h>
@@ -65,7 +65,7 @@ void initializePhoto(){
 
 void tickerTime(){
   time1 = micros();
-  if(animationResult+10000<time1 - wheelTime){
+  if(animationResult+5000<time1 - wheelTime){
     wheelResult = time1 - wheelTime;
     wheelTime = time1;
     Serial.print("Wheel time: ");
@@ -74,7 +74,7 @@ void tickerTime(){
     Serial.print("----- delay time: ");
     Serial.println(delayTime);
   }
-  unsigned long timer = delayTime/1000;
+  unsigned long timer = (delayTime-100)/1000;
   draw.attach_ms(timer, animation);
 }
 
@@ -113,10 +113,11 @@ void animation(){
         palette00[o][0],palette00[o][1],palette00[o][2]);
       }
       imageLine++;
-      strip.show();
+
       if(imageLine>=imageLines){
         imageLine=0;
       }
+      strip.show();
     break;
     case 3:
       uint8_t p, r, g, b;
