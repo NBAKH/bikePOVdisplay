@@ -216,6 +216,7 @@ for imgNum, image in enumerate(images): # For each image in list...
 
 	if image.numColors <= 256:
 		# Output gamma- and brightness-adjusted color palette:
+		print
 		print ("const uint8_t palette%02d[][3] = {" % imgNum)
 		for i in range(image.numColors):
 			sys.stdout.write("  { %3d, %3d, %3d }" % (
