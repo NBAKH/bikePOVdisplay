@@ -1,12 +1,15 @@
-BIKExMESSENGER
+Bike POV display
 ===============
-This is the product for my masters thesis made in collaboration with Natalie Jeremijenko.
-The main part of the display is made by Adafruit.
+This is my version of a persistence-of-vision display attached on a bike. In my version I'm using a ESP8266 module for future wifi integration.
 
+Instructable can be found here: https://www.instructables.com/id/POV-Bike-Display-ESP8266-APA102-UNDER-CONSTRUCTION/
 
-Adafruit Kinetic_POV
+This is not complete yet and it's only 8-bits photos that works at the moment, but that should be enough to display great images. 
+
+Below is thanks and license remarks from adafruit's software. A big thanks for your work.
+
+Groundwork made by Adafruit
 ===========
-
 Software related to DotStar LED persistence-of-vision performance items -- initially just the Trinket-based "Genesis Poi," but might devise more POV projects later...this is where they'll go.
 
 Guide: https://learn.adafruit.com/genesis-poi-dotstar-led-persistence-of-vision-poi
