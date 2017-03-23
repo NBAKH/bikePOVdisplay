@@ -1,10 +1,9 @@
 Bike POV display
 ===============
-This is my version of a persistence-of-vision display attached on a bike. In my version I'm using a ESP8266 module for future wifi integration.
+This is my version of a persistence-of-vision display attached on a bike. In my version I'm using a ESP8266 module for future WiFi integration.
 
 Instructable can be found here: https://www.instructables.com/id/POV-Bike-Display-ESP8266-APA102-UNDER-CONSTRUCTION/
-
-This is not complete yet and it's only 8-bits photos that works at the moment, but that should be enough to display great images. 
+This is not complete yet, and it's only 8-bits photos that works at the moment but that should be enough to display great images.
 
 Below is thanks and license remarks from adafruit's software. A big thanks for your work.
 
